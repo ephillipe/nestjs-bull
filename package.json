@@ -1,18 +1,41 @@
 {
-  "name": "nestjs-kue",
-  "version": "0.2.0",
-  "description": "Kue wrapper for NestJS framework",
-  "author": "Erick Ponce Leão <erickponceleao@gmail.com>",
+  "name": "nestjs-bull",
+  "version": "0.1.0",
+  "description": "Bull wrapper for NestJS framework",
+  "author": {
+    "name": "Erick Phillipe Rezende de Almeida",
+    "email": "ephillipe@gmail.com",
+    "url": "https://about.me/erick.almeida"
+  },
+  "contributors": [
+    {
+      "name": "Erick Ponce Leão",
+      "email": "erickponceleao@gmail.com"
+    }
+  ],
   "license": "MIT",
-  "repository": "git://github.com/erickponce/nestjs-kue",
+  "repository": "git://github.com/ephillipe/nestjs-bull",
   "scripts": {
-    "compile": "tsc -p tsconfig.json"
+    "compile": "tsc -p tsconfig.json",
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec|e2e-spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ]
   },
   "dependencies": {
     "@nestjs/common": "^5.0.0",
     "@nestjs/core": "^5.0.0",
-    "cli-color": "^1.2.0",
-    "kue": "^0.11.6"
+    "bull": "^3.4.8",
+    "cli-color": "^1.2.0"
   },
   "peerDependencies": {
     "@nestjs/core": "~5.*",
@@ -20,11 +43,15 @@
     "reflect-metadata": "^0.1.12"
   },
   "devDependencies": {
-    "@types/kue": "^0.11.7",
+    "@types/bull": "^3.3.20",
+    "@types/jest": "^23.3.2",
     "@types/reflect-metadata": "^0.1.0",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.2.2",
     "gulp-watch": "^4.3.11",
+    "jest": "^23.6.0",
+    "rxjs": "^6.3.2",
+    "ts-jest": "^23.10.1",
     "tslint-eslint-rules": "^4.1.1",
     "typescript": "^3.0.3"
   }

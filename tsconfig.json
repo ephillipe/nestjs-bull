@@ -9,13 +9,13 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es6",
-    "sourceMap": false,
+    "sourceMap": true,
     "allowJs": false,
     "outDir": "./dist"
   },
   "include": [
     "*.ts",
-    "**/*.ts"
+    "**/*.ts", "tests/bull-tests.test.tsx"
   ],
   "exclude": [
     "./node_modules",

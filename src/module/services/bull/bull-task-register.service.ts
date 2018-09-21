@@ -3,7 +3,7 @@ import { ModuleRef } from '@nestjs/core';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { TaskMetadataExplorer } from '../../task-metadata-explorer';
 import { FancyLoggerService } from '../fancy-logger/fancy-logger.service';
-import { KueService } from './kue.service';
+import { BullService } from './bull.service';
 
 export class InvalidModuleRefException extends Error {
     constructor() {
@@ -12,13 +12,13 @@ export class InvalidModuleRefException extends Error {
 }
 
 @Injectable()
-export class KueTaskRegisterService {
+export class BullTaskRegisterService {
     private moduleRef: ModuleRef = null;
     private readonly moduleName: string = 'KueModule';
     private readonly metadataExplorer: TaskMetadataExplorer;
     private readonly fancyLogger: FancyLoggerService;
 
-    constructor(private readonly kueService: KueService) {
+    constructor(private readonly bullService: BullService) {
         this.metadataExplorer = new TaskMetadataExplorer(
             new MetadataScanner()
         );
@@ -42,7 +42,7 @@ export class KueTaskRegisterService {
 
     createTasks(instance) {
         for (const { task, metadata } of this.metadataExplorer.explore(instance)) {
-            this.kueService.registerTask(task, metadata, instance);
+            this.bullService.registerTask(task, metadata, instance);
 
             const desc: string = `Registered task ${metadata.name}`
                 + `${(metadata.queue) ? ' on queue ' + metadata.queue : ''}`

@@ -2,7 +2,7 @@ const gulp = require('gulp');
 const ts = require('gulp-typescript');
 
 const pkg = ts.createProject('./tsconfig.json');
-const moduleName = 'kue';
+const moduleName = 'bull';
 const source = 'src';
 const dist = 'dist';
 

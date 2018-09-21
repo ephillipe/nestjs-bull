@@ -119,27 +119,13 @@ createJob(@Res() res) {
 <p><a href="https://github.com/Automattic/kue" target="blank">Kue</a></p>
 
 ## Debug
-**You can enable some debug logs with KUE_DEBUG environment variable:**
+**You can enable some debug logs with NESTJS_BULL_DEBUG environment variable:**
 
 ```node
-KUE_DEBUG=true
-```
-
-## Kue UI
-<p>It's possible to view info about tasks being executed with the default Kue UI</p>
-<p>To enable it, set KUE_UI_ENABLED environment variable to true:</p>
-<p>WARNING: The UI will be deployed using express!</p>
-
-```node
-KUE_UI_ENABLED=true 
-```
-
-<p>The default UI port is 3050, but if you like to change it use KUE_UI_PORT environment variable:</p>
-
-```node
-KUE_UI_PORT=3050
+NESTJS_BULL_DEBUG=true
 ```
 
 ## People
 
-- Author - [Erick Ponce Leão](https://github.com/erickponce)
+- Author - [Erick Phillipe Rezende de Almeida](https://github.com/ephillipe)
+- Contributor - [Erick Ponce Leão](https://github.com/erickponce)
