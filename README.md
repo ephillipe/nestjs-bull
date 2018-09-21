@@ -29,7 +29,7 @@ src/modules/users/tasks/users.tasks.ts
 ```node
 import { Injectable } from '@nestjs/common';
 import { Job, JobCallback, DoneCallback } from 'kue';
-import { Task } from 'nestjs-kue';
+import { Task } from 'nestjs-bull';
 
 @Injectable()
 export class UsersTasks {
