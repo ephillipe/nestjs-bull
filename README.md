@@ -1,28 +1,18 @@
-## Kue wrapper for NestJS framework
+IN DEVELOPMENT YET
+
+## Bull wrapper for NestJS framework
 
 ## Description
 
-<p>Kue is a priority job queue backed by redis, built for nodeJS.</p> 
-<p>This library provide facilities and utilities to use Kue with NestJS.</p>
+<p>Bull is a Premium Queue package for handling jobs and messages in NodeJS.</p> 
+<p>This library provide facilities and utilities to use Bull with NestJS.</p>
 
 
 ## Installation
 
 ```bash
-$ npm install --save nestjs-kue
+$ npm install --save nestjs-bull
 ```
-
-**This module uses REDIS to operate, and utilizes the following environment variables and the default values as configurations:**
-
-- KUE_REDIS_PREFIX  # Default 'q' 
-- KUE_REDIS_HOST  # Default 'localhost'
-- KUE_REDIS_PORT  # Default 6379
-- KUE_REDIS_DB  # Default 0
-
-As of 0.2.0 version, you are able to use connection URI using *KUE_REDIS_URI* variable like:
-
-redis://example.com:1234?redis_option=value&redis_option=value
-
 
 ## Usage
 
