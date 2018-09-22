@@ -50,9 +50,55 @@ export class UsersTasks {
 })
 ```
 
+**Options when defining a Job:**
+
+More option details, see <https://github.com/OptimalBits/bull/blob/master/REFERENCE.md>
+
+```TypeScript
+interface JobOpts{
+  priority: number; // Optional priority value. ranges from 1 (highest priority) to MAX_INT  (lowest priority). Note that
+                    // using priorities has a slight impact on performance, so do not use it if not required.
+
+  delay: number; // An amount of miliseconds to wait until this job can be processed. Note that for accurate delays, both
+                 // server and clients should have their clocks synchronized. [optional].
+
+  attempts: number; // The total number of attempts to try the job until it completes.
+
+  repeat: RepeatOpts; // Repeat job according to a cron specification.
+
+  backoff: number | BackoffOpts; // Backoff setting for automatic retries if the job fails
+
+  lifo: boolean; // if true, adds the job to the right of the queue instead of the left (default false)
+  timeout: number; // The number of milliseconds after which the job should be fail with a timeout error [optional]
+
+  jobId: number | string; // Override the job ID - by default, the job ID is a unique
+                          // integer, but you can use this setting to override it.
+                          // If you use this option, it is up to you to ensure the
+                          // jobId is unique. If you attempt to add a job with an id that
+                          // already exists, it will not be added.
+
+  removeOnComplete: boolean; // If true, removes the job when it successfully
+                            // completes. Default behavior is to keep the job in the completed set.
+
+  removeOnFail: boolean; // If true, removes the job when it fails after all attempts.
+                         // Default behavior is to keep the job in the failed set.
+  stackTraceLimit: number; // Limits the amount of stack trace lines that will be recorded in the stacktrace.
+}
+```
+
+Firing the task with options:
+
+```TypeScript
+@Get('task')
+createTask() {
+    const opt: Bull.JobOpts = { lifo: true };
+     this.bullService.createJob(this.tasks.justATest, { a: 'b' }, opt);
+}
+
 **To setup the module, include BullModule and the BullTaskRegisterService in modules where you will use tasks, then register the tasks using the method register():**
 
 ```TypeScript
+
 import { ModuleRef } from '@nestjs/core';
 import { BullModule, BullTaskRegisterService } from 'nestjs-bull';
 import { UsersTasks } from './tasks/users.tasks';
@@ -72,12 +118,15 @@ export class UsersModule implements OnModuleInit {
       this.taskRegister.register(UsersTasks);
   }
 }
+
 ```
 
 **Firing a previously defined task:**
+
 Add the BullService and the injectable with the task on your controller
 
 ```TypeScript
+
 import { Get, Controller } from '@nestjs/common';
 import { UsersTasks } from '../tasks/users.tasks';
 import { BullService } from 'nestjs-bull';
@@ -89,22 +138,26 @@ export class AppController {
         private readonly tasks: UsersTasks
     ) {}
 }
+
 ```
 
 Firing the task with { a: 'b' } as argument:
 
 ```TypeScript
+
 @Get('task')
 createTask() {
      this.bullService.createJob(this.tasks.justATest, { a: 'b' })
 }
+
 ```
 
 **A task can emit some events when created:**
 
 For more information, see <https://github.com/OptimalBits/bull#using-promises>
 
-```node
+```TypeScript
+
 @Get('task')
 createJob(@Res() res) {
     this.bullService.createJob(this.tasks.justATest, { a: 'b' })
@@ -120,6 +173,20 @@ createJob(@Res() res) {
         // error
     });
 }
+
+```
+
+**Finding a previously created Job:**
+
+```TypeScript
+
+this.bullService.getJob(JOB_ID).then( (job: Bull.Job) => {
+    if (job) {
+        // tslint:disable-next-line:no-console
+        console.log(job);
+    }
+});
+
 ```
 
 For more options and details, please check Bull docs <https://github.com/OptimalBits/bull>
@@ -129,7 +196,9 @@ For more options and details, please check Bull docs <https://github.com/Optimal
 **You can enable some debug logs with NESTJS_BULL_DEBUG environment variable:**
 
 ```TypeScript
+
 NESTJS_BULL_DEBUG=true
+
 ```
 
 ## People

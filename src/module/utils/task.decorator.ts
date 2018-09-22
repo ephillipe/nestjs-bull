@@ -1,15 +1,12 @@
 import 'reflect-metadata';
 import { TASK_METADATA, TASK_CONFIGURATION_METADATA } from '../constants';
-
+import Bull = require("bull");
 
 export interface TaskMetadata {
     name: string;
     queue?: string;
     concurrency?: number;
-    priority?: string;
-    ttl?: number;
-    attempts?: number;
-    backoff?: { (attempts: number, delay: number): number } | { delay?: number, type: string } | boolean;
+    options: Bull.QueueOptions;
 }
 
 export const Task = (metadata?: TaskMetadata | string): MethodDecorator => {

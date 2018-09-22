@@ -20,27 +20,10 @@ export class BullService {
     private queues: { [name: string]: Bull.Queue } = {};
     private tasks: { [name: string]: TaskMetadata } = {};
     private debugActive: boolean = false;
-    private redisConfig = {
-        prefix: process.env.KUE_REDIS_PREFIX,
-    };
 
     constructor(
         private readonly fancyLogger: FancyLoggerService
     ) {
-        // if (process.env.KUE_REDIS_URI) {
-        //     this.redisConfig = {
-        //         ...this.redisConfig, redis: process.env.KUE_REDIS_URI,
-        //     };
-        // } else {
-        //     this.redisConfig = {
-        //         ...this.redisConfig, redis: {
-        //             port: process.env.KUE_REDIS_PORT,
-        //             host: process.env.KUE_REDIS_HOST,
-        //             db: process.env.KUE_REDIS_DB,
-        //         },
-        //     };
-        // }
-
         this.queues[BullService.DEFAULT_QUEUE_NAME] = this.createQueue(BullService.DEFAULT_QUEUE_NAME);        
     }
 
@@ -48,7 +31,7 @@ export class BullService {
         let queueName: string = metadata.queue || BullService.DEFAULT_QUEUE_NAME;
         let concurrency: number = metadata.concurrency || BullService.DEFAULT_CONCURRENCY;
         if (!this.queues[queueName]) {
-            this.queues[queueName] = this.createQueue(queueName);
+            this.queues[queueName] = this.createQueue(queueName, metadata.options);
         }
         this.queues[queueName].process(metadata.name, concurrency, async (j, d) => {
             return Promise.resolve(task.call(ctrl, j, d));
@@ -56,16 +39,14 @@ export class BullService {
         this.tasks[metadata.name] = metadata;
     }
 
-    private createQueue(queueName: string): Bull.Queue {
-        let queue: Bull.Queue = new Bull(queueName, this.redisConfig);
-
+    private createQueue(queueName: string, queueOptions? : Bull.QueueOptions): Bull.Queue {
+        let queue: Bull.Queue = new Bull(queueName, queueOptions);
         if (!this.debugActive && 
             process.env.NESTJS_BULL_DEBUG && 
             queueName == BullService.DEFAULT_QUEUE_NAME) {
             this.debugActive = true;
             this.bindDebugQueueEvents(queue);
         }
-
         return queue;
     }
 
@@ -75,7 +56,6 @@ export class BullService {
                 if (job) this.debugLog(job, event);
             });
         }
-
         queue.on('error', (err: Error) => {
            if (err) this.debugLog(undefined, 'job error', err);
         });
@@ -87,22 +67,25 @@ export class BullService {
         this.fancyLogger.info('KueModule', log, 'TaskRunner');
     }
 
+    private getQueue(name: string): Bull.Queue {
+        let queueName: string = name || BullService.DEFAULT_QUEUE_NAME;
+        let queue: Bull.Queue = this.queues[queueName];
+        return queue;
+    }
+
     createJob(task, data: Object, opts?: Bull.JobOptions): Bluebird<Bull.Job<any>> {
         let metadata: TaskMetadata = this.tasks[task.name];
-        let queueName: string = metadata.queue || BullService.DEFAULT_QUEUE_NAME;
-        let queue: Bull.Queue = this.queues[queueName];
+        let queue: Bull.Queue = this.getQueue(metadata.queue);
 
         return queue.add(metadata.name, data, opts);
     }
-        
-    // getJob(id: string): Promise<kue.Job> {
-    //   return new Promise((resolve, reject) => {
-    //       kue.Job.get(id, (err, job: kue.Job) => {
-    //           if (err) {
-    //               return reject(err);
-    //           }
-    //           return resolve(job);
-    //       });
-    //   });
-    // }
+
+    getJob(jobId: Bull.JobId, queueName?: string): Promise<Bull.Job> {
+      return new Promise((resolve, reject) => {
+            let queue: Bull.Queue = this.getQueue(queueName);
+            queue.getJob(jobId).then( (job?: Bull.Job) => {              
+                return resolve(job);
+            });
+        });
+    }
 }
