@@ -1,48 +1,46 @@
-IN DEVELOPMENT YET
-
-## Bull wrapper for NestJS framework
+# Bull wrapper for NestJS framework
 
 ## Description
 
-<p>Bull is a Premium Queue package for handling jobs and messages in NodeJS.</p> 
-<p>This library provide facilities and utilities to use Bull with NestJS.</p>
-
+Bull is a Premium Queue package for handling jobs and messages in NodeJS.
+This library provide facilities and utilities to use Bull with NestJS.
 
 ## Installation
 
 ```bash
-$ npm install --save nestjs-bull
+npm install --save nestjs-bull
 ```
 
 ## Usage
 
 **Defining tasks:**
 
-<p>Tasks are defined in files like:<p/>
+Tasks are defined in files like:
 
-```
+```TypeScript
 src/modules/users/tasks/users.tasks.ts
 ```
 
-<p>You can define multiple tasks as a single injectable:</p>
+You can define multiple tasks as a single injectable:
 
-```node
+```TypeScript
 import { Injectable } from '@nestjs/common';
-import { Job, JobCallback, DoneCallback } from 'kue';
+import Bull = require('bull');
 import { Task } from 'nestjs-bull';
 
 @Injectable()
 export class UsersTasks {
-    @Task({ name: 'justATest' })
-    justATest(job: Job, done: DoneCallback) {
-        const result: string = 'Ended just fine!';
+    @Task({ name: 'justATest', concurrency: 3 })
+    justATest(job: Bull.Job, done: Bull.DoneCallback) {
+        const result: string = `Job (${job.id}) Ended just fine!`;
         done(null, result);
     }
 }
-``` 
+```
 
 **Options when defining a task:**
-```node
+
+```TypeScript
 @Task({
     name: 'justATest',
     concurrency: 3,
@@ -52,76 +50,85 @@ export class UsersTasks {
 })
 ```
 
-**To setup the module, include KueModule and the KueTaskRegisterService in modules where you will use tasks, then register the tasks using the method register():**
+**To setup the module, include BullModule and the BullTaskRegisterService in modules where you will use tasks, then register the tasks using the method register():**
 
-```node
+```TypeScript
 import { ModuleRef } from '@nestjs/core';
-import { KueModule, KueTaskRegisterService } from 'nestjs-kue';
+import { BullModule, BullTaskRegisterService } from 'nestjs-bull';
 import { UsersTasks } from './tasks/users.tasks';
 
 @Module({
-  imports: [KueModule],
+  imports: [BullModule],
   controllers: [UsersController],
-  providers: [UsersTasks],
+  providers: [UsersService, UsersTasks],
 })
 export class UsersModule implements OnModuleInit {
-    constructor(
-        private readonly moduleRef: ModuleRef,
-        private readonly taskRegister: KueTaskRegisterService
-    ) {}
-
-    onModuleInit() {
-        this.taskRegister.setModuleRef(this.moduleRef);
-        this.taskRegister.register(UsersTasks);
-    }
+  constructor(
+      private readonly moduleRef: ModuleRef,
+      private readonly taskRegister: BullTaskRegisterService,
+  ) {}
+  onModuleInit() {
+      this.taskRegister.setModuleRef(this.moduleRef);
+      this.taskRegister.register(UsersTasks);
+  }
 }
 ```
 
 **Firing a previously defined task:**
-<p>Add the KueServive and the injectable with the task on your controller</p>
+Add the BullService and the injectable with the task on your controller
 
-```node
+```TypeScript
 import { Get, Controller } from '@nestjs/common';
-import { UsersTasks } from './tasks/users.tasks';
-import { KueService } from 'nestjs-kue';
+import { UsersTasks } from '../tasks/users.tasks';
+import { BullService } from 'nestjs-bull';
 
 @Controller()
 export class AppController {
     constructor(
-        private readonly kueService: KueService,
+        private readonly bullService: BullService,
         private readonly tasks: UsersTasks
     ) {}
 }
-``` 
+```
 
-<p>Firing the task with { a: 'b' } as argument:</p>
+Firing the task with { a: 'b' } as argument:
 
-```node
+```TypeScript
 @Get('task')
 createTask() {
-    const job = this.kueService.createJob(this.tasks.justATest, { a: 'b' }).save();
+     this.bullService.createJob(this.tasks.justATest, { a: 'b' })
 }
 ```
 
-**A task can emit some events when fired:**
-<p>https://github.com/Automattic/kue#job-events</p>
+**A task can emit some events when created:**
+
+For more information, see <https://github.com/OptimalBits/bull#using-promises>
 
 ```node
 @Get('task')
 createJob(@Res() res) {
-    const job = this.kueService.createJob(this.tasks.justATest, { a: 'b' }).save();
-    job.on('complete', (result) => res.send(result));
-    job.on('failed', (err) => res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err));
+    this.bullService.createJob(this.tasks.justATest, { a: 'b' })
+    .then((job) => {
+        // When job has successfully be placed in the queue the job is returned
+        // then wait for completion
+        return job.finished();
+    })
+    .then((value) => {
+        // completed successfully
+    })
+    .catch((err) => {
+        // error
+    });
 }
 ```
 
-**For more options and details, please check Kue docs**
-<p><a href="https://github.com/Automattic/kue" target="blank">Kue</a></p>
+For more options and details, please check Bull docs <https://github.com/OptimalBits/bull>
 
 ## Debug
+
 **You can enable some debug logs with NESTJS_BULL_DEBUG environment variable:**
 
-```node
+```TypeScript
 NESTJS_BULL_DEBUG=true
 ```
 

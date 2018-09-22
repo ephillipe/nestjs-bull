@@ -34,6 +34,7 @@
   "dependencies": {
     "@nestjs/common": "^5.0.0",
     "@nestjs/core": "^5.0.0",
+    "bluebird": "^3.5.2",
     "bull": "^3.4.8",
     "cli-color": "^1.2.0"
   },

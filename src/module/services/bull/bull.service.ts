@@ -3,6 +3,7 @@ import { TaskMetadata } from '../../utils/task.decorator';
 import { FancyLoggerService } from '../fancy-logger/fancy-logger.service';
 import { Controller } from "@nestjs/common/interfaces";
 import Bull = require("bull");
+import * as Bluebird from "bluebird";
 
 
 @Injectable()
@@ -85,4 +86,23 @@ export class BullService {
         log += `${(err) ? '\n' + FancyLoggerService.clc.red(err) : ''}`;
         this.fancyLogger.info('KueModule', log, 'TaskRunner');
     }
+
+    createJob(task, data: Object, opts?: Bull.JobOptions): Bluebird<Bull.Job<any>> {
+        let metadata: TaskMetadata = this.tasks[task.name];
+        let queueName: string = metadata.queue || BullService.DEFAULT_QUEUE_NAME;
+        let queue: Bull.Queue = this.queues[queueName];
+
+        return queue.add(metadata.name, data, opts);
+    }
+        
+    // getJob(id: string): Promise<kue.Job> {
+    //   return new Promise((resolve, reject) => {
+    //       kue.Job.get(id, (err, job: kue.Job) => {
+    //           if (err) {
+    //               return reject(err);
+    //           }
+    //           return resolve(job);
+    //       });
+    //   });
+    // }
 }

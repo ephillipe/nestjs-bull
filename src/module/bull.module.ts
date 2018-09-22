@@ -14,4 +14,4 @@ const express = require('express');
     ],
     exports: [BullService, BullTaskRegisterService],
 })
-export class KueModule {}
+export class BullModule {}
