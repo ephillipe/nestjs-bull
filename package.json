@@ -1,12 +1,20 @@
 {
   "name": "nestjs-bull",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Bull wrapper for NestJS framework",
   "author": {
     "name": "Erick Phillipe Rezende de Almeida",
     "email": "ephillipe@gmail.com",
     "url": "https://about.me/erick.almeida"
   },
+  "keywords": [
+    "bull",
+    "job",
+    "queue",
+    "task",
+    "parallel",
+    "nestjs"
+  ],
   "contributors": [
     {
       "name": "Erick Ponce Leão",
