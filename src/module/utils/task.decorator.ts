@@ -6,7 +6,7 @@ export interface TaskMetadata {
     name: string;
     queue?: string;
     concurrency?: number;
-    options: Bull.QueueOptions;
+    options?: Bull.QueueOptions;
 }
 
 export const Task = (metadata?: TaskMetadata | string): MethodDecorator => {
