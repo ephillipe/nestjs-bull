@@ -44,9 +44,6 @@ export class UsersTasks {
 @Task({
     name: 'justATest',
     concurrency: 3,
-    attempts: 3,
-    ttl: 3000,
-    backoff: { delay: 5 * 1000, type: 'fixed' }
 })
 ```
 
@@ -55,7 +52,7 @@ export class UsersTasks {
 More option details, see <https://github.com/OptimalBits/bull/blob/master/REFERENCE.md>
 
 ```TypeScript
-interface JobOpts{
+interface JobOptions{
   priority: number; // Optional priority value. ranges from 1 (highest priority) to MAX_INT  (lowest priority). Note that
                     // using priorities has a slight impact on performance, so do not use it if not required.
 
@@ -91,7 +88,7 @@ Firing the task with options:
 ```TypeScript
 @Get('task')
 createTask() {
-    const opt: Bull.JobOpts = { lifo: true };
+    const opt: Bull.JobOptions = { lifo: true };
      this.bullService.createJob(this.tasks.justATest, { a: 'b' }, opt);
 }
 
